@@ -1,0 +1,55 @@
+services:
+  github:
+    required_keys:
+      - key: name
+        label: Full Name
+      - key: email
+        label: Email
+      - key: organization
+        label: Organization
+      - key: role
+        label: Role
+    tool:
+      name: github_onboarding_tool
+      description: |- 
+        "Onboarding to GitHub based on information in form of yaml. 
+        You don't need to provide information in yaml format, you just need to tell me the information for each required field, and I will generate the yaml for you."
+    instruction: |-
+      "Before we can onboard you to GitHub, we need some information from you. Please see the checklist below:"
+  
+  launchdarkly:
+    required_keys:
+      - key: name
+        label: Full Name
+      - key: email
+        label: Email
+      - key: department
+        label: Department
+      - key: project
+        label: Project
+    tool:
+      name: launchdarkly_onboarding_tool
+      description: |- 
+        "Onboarding to LaunchDarkly based on information in form of yaml. 
+        You don't need to provide information in yaml format, you just need to tell me the information for each required field, and I will generate the yaml for you."
+    instruction: |-
+        "Before we can onboard you to LaunchDarkly, we need some information from you. Please see the checklist below:"
+  snyk:
+    required_keys:
+      - key: name
+        label: Full Name
+      - key: email
+        label: Email
+      - key: repository
+        label: Repository
+      - key: branch
+        label: Branch
+    tool:
+      name: snyk_onboarding_tool
+      description: |- 
+        "Onboarding to Snyk based on information in form of yaml. 
+        You don't need to provide information in yaml format, you just need to tell me the information for each required field, and I will generate the yaml for you."
+    instruction: |-
+        "Before we can onboard you to Snyk, we need some information from you. Please see the checklist below:"
+    
+    

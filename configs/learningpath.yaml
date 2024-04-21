@@ -1,0 +1,151 @@
+services:
+  github:
+    tool:
+      name: github_learningpath_tool
+      description: |- 
+        Determine the user GitHub knowledge level based on information provided by the user, and suggest the learning path based on level (beginning, intermediate, advanced).
+    
+    learningObjects:
+      - topic: "Introduction to Git and GitHub"
+        description: |- 
+          Understand basic version control concepts and how GitHub facilitates collaboration.
+          Learn basic version control concepts and how GitHub facilitates collaboration.
+        level: "beginner"
+        resources: []
+      - topic: "GitHub Repositories"
+        description: |- 
+          Understand how to create, clone, and manage repositories.
+        level: "beginner"
+        resources: []
+      - topic: "Issues and Pull Requests"
+        description: |- 
+          Learn how to create, manage, and contribute to issues and pull requests, as well as collaborate with others.
+        level: "beginner"
+        resources: []
+
+      - topic: "GitHub for Developers"
+        description: |- 
+          Learn how to use GitHub for development. Understand the GitHub flow, code review, and collaboration.
+        level: "intermediate"
+        resources: []
+      - topic: "Branching and Merging"
+        description: |- 
+          Understand how to create branches, merge changes, and resolve conflicts. Master the workflow of managing multiple versions of code.
+        level: "intermediate"
+        resources: []
+      - topic: "GitHub Actions"
+        description: |- 
+          Learn how to automate workflows and build, test, and deploy code directly from GitHub.
+          Get started with automating, customizing, and executing your software development workflows right within your repository.
+        level: "intermediate"
+        resources: []
+
+      - topic: "CI/CD with GitHub Actions"
+        description: |- 
+          Deep dive into continuous integration and deployment with GitHub Actions.
+        level: "advanced"
+        resources: []
+      - topic: "Security and Code Scanning"
+        description: |- 
+          Learn how to secure your code and identify vulnerabilities with GitHub.
+        level: "advanced"
+        resources: []
+      - topic: "Advanced GitHub Features"
+        description: |- 
+          Explore advanced topics like GitHub Pages, Wikis, and Insights for project management and documentation.
+        level: "advanced"
+        resources: []
+  
+  launchdarkly:
+    tool:
+      name: launchdarkly_learningpath_tool
+      description: |- 
+        Determine the user LaunchDarkly knowledge level based on information provided by the user, and suggest the learning path based on level (beginning, intermediate, advanced).
+    learningObjects:
+      - topic: "LaunchDarkly 101"
+        description: |- 
+          Start with the "LaunchDarkly for Beginners" course to understand the basics of feature flagging and how LaunchDarkly enables faster and safer delivery.
+        level: "beginner"
+        resources: []
+      - topic: "Documentation Deep Dive"
+        description: |- 
+          Explore the LaunchDarkly Documentation for a deeper understanding of the basic concepts.
+        level: "beginner"
+        resources: []
+      - topic: "Creating Your First Feature Flag"
+        description: |- 
+          Practical application through creating and managing a simple feature flag.
+        level: "beginner"
+        resources: []
+      
+      - topic: "The Relay Proxy"
+        description: |- 
+          Learn about the Relay Proxy, its configuration, and benefits in a distributed system.
+        level: "intermediate"
+        resources: []
+      - topic: "Rule Evaluation with Flags"
+        description: |- 
+          Delve into flag variations, types, and purposes, enhancing your capability to use flags in more dynamic contexts.
+        level: "intermediate"
+        resources: []
+      - topic: "Experimentation and Targeting"
+        description: |- 
+          Understand how to deliver targeted product experiences and conduct experiments to maximize feature impact.
+        level: "intermediate"
+        resources: []
+
+      - topic: "Advanced Feature Flagging Strategies"
+        description: |- 
+          Engage with complex scenarios, such as managing flags at scale, integrating with CI/CD pipelines, and advanced targeting techniques.
+        level: "advanced"
+        resources: []
+      - topic: "Monitoring and Metrics"
+        description: |- 
+          Learn how to monitor flag performance, track metrics, and optimize feature flagging strategies.
+        level: "advanced"
+        resources: []
+      - topic: "LaunchDarkly Best Practices"
+        description: |- 
+          Explore best practices for feature flagging, including security, performance, and scalability considerations.
+        level: "advanced"
+        resources: []
+  
+  snyk:
+    tool:
+      name: snyk_learningpath_tool
+      description: |- 
+        Determine the user Snyk knowledge level based on information provided by the user, and suggest the learning path based on level (beginning, intermediate, advanced).
+    
+    learningObjects:
+      - topic: "Snyk Fundamentals"
+        description: |- 
+          Introduction to Snyk, understanding vulnerabilities, and setting up your first project.
+        level: "beginner"
+        resources: []
+      - topic: "Using Snyk with Version Control Systems"
+        description: |- 
+          Learn how to integrate Snyk with version control systems like GitHub for automated security testing.
+        level: "beginner"
+        resources: []
+
+      - topic: "Dependency Scanning and Remediation"
+        description: |- 
+          Understand how to scan dependencies for vulnerabilities and remediate issues effectively.
+        level: "intermediate"
+        resources: []
+      - topic: "Snyk for CI/CD"
+        description: |- 
+          Integrate Snyk into your Continuous Integration/Continuous Deployment pipelines to catch vulnerabilities early.
+        level: "intermediate"
+        resources: []
+
+      - topic: "Policy Management and Custom Rules"
+        description: |- 
+          Learn to create and manage security policies, implementing custom rules for your organization.
+        level: "advanced"
+        resources: []
+      - topic: "Advanced Snyk Features"
+        description: |- 
+          Explore advanced features like Snyk Code, Container Security, and Infrastructure as Code scanning.
+        level: "advanced"
+        resources: []

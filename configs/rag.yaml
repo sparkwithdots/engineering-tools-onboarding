@@ -1,0 +1,71 @@
+services:
+  github:
+    retrievers:
+      - type: pdf
+        paths:
+        - "resources/github-training-manual.pdf"
+      - type: web
+        # partial doc links from official doc site https://docs.github.com/en/actions
+        paths:
+        - "https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions"
+        - "https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions"
+        - "https://docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions"
+        - "https://docs.github.com/en/actions/learn-github-actions/expressions"
+        - "https://docs.github.com/en/actions/learn-github-actions/contexts"
+        - "https://docs.github.com/en/actions/learn-github-actions/variables"
+        - "https://docs.github.com/en/actions/learn-github-actions/using-starter-workflows"
+        - "https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration"
+        - "https://docs.github.com/en/actions/examples/using-scripts-to-test-your-code-on-a-runner"
+        - "https://docs.github.com/en/actions/examples/using-the-github-cli-on-a-runner"
+        - "https://docs.github.com/en/actions/examples/using-concurrency-expressions-and-a-test-matrix"
+        - "https://docs.github.com/en/actions/using-workflows/about-workflows"
+        - "https://docs.github.com/en/actions/using-workflows/triggering-a-workflow"
+        - "https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow"
+        - "https://docs.github.com/en/actions/using-workflows/disabling-and-enabling-a-workflow"
+        - "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows"
+        - "https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions"
+        - "https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions"
+        - "https://docs.github.com/en/actions/using-workflows/reusing-workflows"
+        - "https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows"
+        - "https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts"
+        - "https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization"
+        - "https://docs.github.com/en/actions/using-workflows/sharing-workflows-secrets-and-runners-with-your-organization"
+        - "https://docs.github.com/en/actions/using-workflows/using-github-cli-in-workflows"
+        - "https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow"
+        - "https://docs.github.com/en/actions/using-jobs/choosing-the-runner-for-a-job"
+        - "https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution"
+        - "https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs"
+        - "https://docs.github.com/en/actions/using-jobs/using-concurrency"
+        - "https://docs.github.com/en/actions/using-jobs/using-environments-for-jobs"
+        - "https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container"
+        - "https://docs.github.com/en/actions/using-jobs/setting-default-values-for-jobs"
+        - "https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs"
+        - "https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs"
+        - "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions"
+        - "https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions"
+        - "https://docs.github.com/en/actions/security-guides/using-githubs-security-features-to-secure-your-use-of-github-actions"
+        - "https://docs.github.com/en/actions/security-guides/automatic-token-authentication"
+
+  launchdarkly:
+    retrievers:
+      - type: pdf
+        paths:
+        - "resources/feature-flags-for-beginners-launchdarkly.pdf"
+        - "resources/feature-flagging-best-practices-mega-guide.pdf"
+      - type: web
+        # partial doc links from official doc site https://docs.launchdarkly.com/home
+        paths:
+        - "https://docs.launchdarkly.com/home/getting-started"
+        - "https://docs.launchdarkly.com/home/getting-started/setting-up"
+        - "https://docs.launchdarkly.com/home/getting-started/your-account"
+        - "https://docs.launchdarkly.com/home/getting-started/multiple-accounts"
+        - "https://docs.launchdarkly.com/home/getting-started/learning-center"
+        - "https://docs.launchdarkly.com/home/getting-started/architecture"
+        - "https://docs.launchdarkly.com/home/getting-started/vocabulary"
+  
+  snyk:
+    retrievers:
+      - type: gitbook
+        paths:
+        - "https://docs.snyk.io"
+            
