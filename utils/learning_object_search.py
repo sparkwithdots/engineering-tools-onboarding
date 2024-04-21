@@ -37,25 +37,6 @@ def generate_learning_objects_dataframe() -> pd.DataFrame:
     df = pd.read_csv(learning_object_data)
     df["vector"] = df["embeddings"].apply(ast.literal_eval)
     return df
-    # if os.path.exists(learning_object_data):      
-    #     df =  pd.read_csv(learning_object_data)
-    #     df["vector"] = df["embeddings"].apply(ast.literal_eval)
-    #     return df
-    # data = []
-    # for service, config in Configs.learningpath_configs()["services"].items():
-    #     for item in config["learningObjects"]:
-    #         data.append({
-    #             "service": service,
-    #             "topic": item["topic"],
-    #             "description": item["description"],
-    #             "level": item["level"],
-    #             "topic_desc": item["topic"] + "\n\n" + item["description"]
-    #         })
-    # df = pd.DataFrame(data)
-    # df["embeddings"] = df["topic_desc"].apply(embed_text)
-    # df.to_csv(learning_object_data, index=False)
-    # df["vector"] = df["embeddings"]
-    # return df
 
 def search_learning_objects(service: str, queries: List[str], df: pd.DataFrame, top_n: int = 3) -> List[str]:
     df_temp = df.copy()
