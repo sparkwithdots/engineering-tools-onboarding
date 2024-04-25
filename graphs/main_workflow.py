@@ -75,14 +75,14 @@ def route(state):
             if "service" in choices.keys() and "feature" in choices.keys():
                 service, feature = choices["service"], choices["feature"]
                 if service == "" or feature == "":
-                    return "End"
+                    return "general"
                 else:
                     if feature == "onboarding":
                         return f"{service}_CollectInfoAgent"
                     else:              
                         return f"{service}_{feature}"
             else:
-                return "End"
+                return "general"
         else:
             service, _ = get_service_and_feature_from_messages(messages)
             if not service or service == "":
@@ -125,7 +125,7 @@ class MainWorkflow():
         
         collect_info_func = collect_info_tool(onboardService=onboard_svc)       
         tool_executor = ToolExecutor([collect_info_func])
-        model = llm.bind_functions([convert_to_openai_function(t) for t in [collect_info_func]])
+        model = llm.bind_functions(functions=[convert_to_openai_function(t) for t in [collect_info_func]], function_call="auto")
         collect_info_agent = partial(call_model, model=model, base_model=llm)
         collect_info_action = partial(call_tool, tool_executor=tool_executor)
         onboard_svc_func = partial(onboard_service, onboardService=onboard_svc)
@@ -151,9 +151,12 @@ class MainWorkflow():
         self.query_services.append(service)
         
     def build_graph(self):
-        router_model = self.llm.bind_functions([convert_to_openai_function(t) for t in [get_service_and_feature]])
+        router_model = self.llm.bind_functions(functions=[convert_to_openai_function(t) for t in [get_service_and_feature]], function_call="get_service_and_feature")
         router_chain = get_general_messages | router_model
         router = partial(call_model, model=router_chain, base_model=self.llm)
+
+        general_chain = get_general_messages | self.llm
+        general_node = partial(call_model, model=general_chain, base_model=self.llm)
         
         self.workflow.add_node("router", router)
         nodes = {}
@@ -169,7 +172,8 @@ class MainWorkflow():
         for name, node in self.query_nodes.items():
             self.workflow.add_node(name, node)
             nodes[name] = name
-        
+        self.workflow.add_node("general", general_node)
+        nodes["general"] = "general"
         nodes["End"] = END
         self.workflow.add_conditional_edges("router", route, nodes)
         for service in self.onboarding_services:
@@ -196,6 +200,7 @@ class MainWorkflow():
         for service in self.query_services:
             self.workflow.add_edge(f"{service}_query", END)
         
+        self.workflow.add_edge("general", END)
         self.workflow.set_entry_point("router")
         self.graph = self.workflow.compile(checkpointer=self.memory)
         return self.graph

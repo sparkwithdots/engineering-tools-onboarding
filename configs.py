@@ -18,6 +18,10 @@ class Configs:
     def get_configs(name: str) -> dict:
         with open(f"configs/{name}.yaml", "r") as file:
             return yaml.safe_load(file)
+
+    @staticmethod
+    def general_configs() -> dict:
+        return Configs.get_configs("general")
         
     @staticmethod
     def onboarding_configs() -> dict:

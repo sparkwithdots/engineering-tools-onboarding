@@ -198,7 +198,7 @@ def call_model(state, model, base_model):
     last_message = messages[-1]
     confirm = need_confirm(messages)
     if confirm and isinstance(last_message, HumanMessage):
-        _llm = base_model.bind_functions([convert_to_openai_function(t) for t in [confirm_onboarding]])
+        _llm = base_model.bind_functions(functions=[convert_to_openai_function(t) for t in [confirm_onboarding]], function_call="confirm_onboarding")
         chain = get_confirm_messages | _llm
         response = chain.invoke([HumanMessage(content = last_message.content)])
     else:

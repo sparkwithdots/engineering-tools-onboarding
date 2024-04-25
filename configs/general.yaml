@@ -1,0 +1,3 @@
+# For GPT-4 model, use "gpt-4-turbo-preview"
+router_model: "gpt-3.5-turbo"
+service_model: "gpt-3.5-turbo"

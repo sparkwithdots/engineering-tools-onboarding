@@ -18,6 +18,7 @@ from utils.base_service_query import BaseServiceQuery
 from langchain_community.tools.tavily_search import TavilySearchResults
 import nest_asyncio
 from dotenv import load_dotenv
+from configs import Configs
 
 def main():
    
@@ -25,9 +26,8 @@ def main():
     
     nest_asyncio.apply()
     memory = SqliteSaver(conn=sqlite3.connect(":memory:", check_same_thread=False))
-    router_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
-    llm4 = ChatOpenAI(model_name="gpt-4-turbo-preview", temperature=0)
-    #llm4 = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    router_model = ChatOpenAI(model_name=Configs.general_configs()["router_model"], temperature=0)
+    service_model = ChatOpenAI(model_name=Configs.general_configs()["service_model"], temperature=0)
     thread_id = str(uuid.uuid4())
     
     github_onboarding_service = GitHubOnboardService(service="github")
@@ -50,17 +50,17 @@ def main():
     snyk_retriever_tool = snyk_query.build_retriever_tool(name="SnykServiceQuery", description="Query documentation and answer question for Snyk service")
     
     main_workflow = MainWorkflow(llm=router_model, memory=memory)
-    main_workflow.register_onboarding_service(service="github", onboard_svc=github_onboarding_service, llm=llm4)
-    main_workflow.register_onboarding_service(service="launchdarkly", onboard_svc=launchdarkly_onboarding_service, llm=llm4)
-    main_workflow.register_onboarding_service(service="snyk", onboard_svc=snyk_onboarding_service, llm=llm4)
+    main_workflow.register_onboarding_service(service="github", onboard_svc=github_onboarding_service, llm=service_model)
+    main_workflow.register_onboarding_service(service="launchdarkly", onboard_svc=launchdarkly_onboarding_service, llm=service_model)
+    main_workflow.register_onboarding_service(service="snyk", onboard_svc=snyk_onboarding_service, llm=service_model)
     
-    main_workflow.register_learningpath_service(service="github", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "GitHub"}, tools=[lookup_learningobjects, github_learningpath_tool], llm=llm4)
-    main_workflow.register_learningpath_service(service="launchdarkly", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "LaunchDarkly"}, tools=[lookup_learningobjects, launchdarkly_learningpath_tool], llm=llm4)
-    main_workflow.register_learningpath_service(service="snyk", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "Snyk"}, tools=[lookup_learningobjects, snyk_learningpath_tool], llm=llm4)
+    main_workflow.register_learningpath_service(service="github", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "GitHub"}, tools=[lookup_learningobjects, github_learningpath_tool], llm=service_model)
+    main_workflow.register_learningpath_service(service="launchdarkly", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "LaunchDarkly"}, tools=[lookup_learningobjects, launchdarkly_learningpath_tool], llm=service_model)
+    main_workflow.register_learningpath_service(service="snyk", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "Snyk"}, tools=[lookup_learningobjects, snyk_learningpath_tool], llm=service_model)
     
-    main_workflow.register_query_service(service="launchdarkly", prompt_path="prompts/templates/query.txt", prompt_data={"service": "GitHub"}, tools=[search_tool, launchdarkly_retriever_tool], llm=llm4)
-    main_workflow.register_query_service(service="github", prompt_path="prompts/templates/query.txt", prompt_data={"service": "LaunchDarkly"}, tools=[search_tool, github_retriever_tool], llm=llm4)
-    main_workflow.register_query_service(service="snyk", prompt_path="prompts/templates/query.txt", prompt_data={"service": "Snyk"}, tools=[search_tool, snyk_retriever_tool], llm=llm4)
+    main_workflow.register_query_service(service="launchdarkly", prompt_path="prompts/templates/query.txt", prompt_data={"service": "GitHub"}, tools=[search_tool, launchdarkly_retriever_tool], llm=service_model)
+    main_workflow.register_query_service(service="github", prompt_path="prompts/templates/query.txt", prompt_data={"service": "LaunchDarkly"}, tools=[search_tool, github_retriever_tool], llm=service_model)
+    main_workflow.register_query_service(service="snyk", prompt_path="prompts/templates/query.txt", prompt_data={"service": "Snyk"}, tools=[search_tool, snyk_retriever_tool], llm=service_model)
     
     graph = main_workflow.build_graph()
     
