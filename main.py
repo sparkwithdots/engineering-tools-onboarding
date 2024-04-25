@@ -25,7 +25,9 @@ def main():
     
     nest_asyncio.apply()
     memory = SqliteSaver(conn=sqlite3.connect(":memory:", check_same_thread=False))
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    router_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    llm4 = ChatOpenAI(model_name="gpt-4-turbo-preview", temperature=0)
+    #llm4 = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
     thread_id = str(uuid.uuid4())
     
     github_onboarding_service = GitHubOnboardService(service="github")
@@ -47,18 +49,18 @@ def main():
     snyk_query = BaseServiceQuery(service="snyk")
     snyk_retriever_tool = snyk_query.build_retriever_tool(name="SnykServiceQuery", description="Query documentation and answer question for Snyk service")
     
-    main_workflow = MainWorkflow(llm=llm, memory=memory)
-    main_workflow.register_onboarding_service(service="github", onboard_svc=github_onboarding_service)
-    main_workflow.register_onboarding_service(service="launchdarkly", onboard_svc=launchdarkly_onboarding_service)
-    main_workflow.register_onboarding_service(service="snyk", onboard_svc=snyk_onboarding_service)
+    main_workflow = MainWorkflow(llm=router_model, memory=memory)
+    main_workflow.register_onboarding_service(service="github", onboard_svc=github_onboarding_service, llm=llm4)
+    main_workflow.register_onboarding_service(service="launchdarkly", onboard_svc=launchdarkly_onboarding_service, llm=llm4)
+    main_workflow.register_onboarding_service(service="snyk", onboard_svc=snyk_onboarding_service, llm=llm4)
     
-    main_workflow.register_learningpath_service(service="github", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "GitHub"}, tools=[lookup_learningobjects, github_learningpath_tool], llm=llm)
-    main_workflow.register_learningpath_service(service="launchdarkly", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "LaunchDarkly"}, tools=[lookup_learningobjects, launchdarkly_learningpath_tool], llm=llm)
-    main_workflow.register_learningpath_service(service="snyk", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "Snyk"}, tools=[lookup_learningobjects, snyk_learningpath_tool], llm=llm)
+    main_workflow.register_learningpath_service(service="github", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "GitHub"}, tools=[lookup_learningobjects, github_learningpath_tool], llm=llm4)
+    main_workflow.register_learningpath_service(service="launchdarkly", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "LaunchDarkly"}, tools=[lookup_learningobjects, launchdarkly_learningpath_tool], llm=llm4)
+    main_workflow.register_learningpath_service(service="snyk", prompt_path="prompts/templates/learningpath.txt", prompt_data={"service": "Snyk"}, tools=[lookup_learningobjects, snyk_learningpath_tool], llm=llm4)
     
-    main_workflow.register_query_service(service="launchdarkly", prompt_path="prompts/templates/query.txt", prompt_data={"service": "GitHub"}, tools=[search_tool, launchdarkly_retriever_tool], llm=llm)
-    main_workflow.register_query_service(service="github", prompt_path="prompts/templates/query.txt", prompt_data={"service": "LaunchDarkly"}, tools=[search_tool, github_retriever_tool], llm=llm)
-    main_workflow.register_query_service(service="snyk", prompt_path="prompts/templates/query.txt", prompt_data={"service": "Snyk"}, tools=[search_tool, snyk_retriever_tool], llm=llm)
+    main_workflow.register_query_service(service="launchdarkly", prompt_path="prompts/templates/query.txt", prompt_data={"service": "GitHub"}, tools=[search_tool, launchdarkly_retriever_tool], llm=llm4)
+    main_workflow.register_query_service(service="github", prompt_path="prompts/templates/query.txt", prompt_data={"service": "LaunchDarkly"}, tools=[search_tool, github_retriever_tool], llm=llm4)
+    main_workflow.register_query_service(service="snyk", prompt_path="prompts/templates/query.txt", prompt_data={"service": "Snyk"}, tools=[search_tool, snyk_retriever_tool], llm=llm4)
     
     graph = main_workflow.build_graph()
     
@@ -75,6 +77,9 @@ def main():
     
     if "config" not in st.session_state:
         st.session_state.config = config
+    
+    if "prev_msgs" not in st.session_state:
+        st.session_state.prev_msgs = []
 
     st.title("Onboarding to SaaS based engineering tools")
     
@@ -90,9 +95,10 @@ def main():
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             
-            thread_id, prev_msgs = st.session_state.workflow.update_state(st.session_state.config)
-            print("\n*** Before invoke:  " + st.session_state.config["configurable"]["thread_id"] + "****\n")
-            response = st.session_state.graph.invoke({"messages": prev_msgs + [HumanMessage(content=user_input)], "thread_id": thread_id}, config=st.session_state.config)
+            st.session_state.workflow.update_state_after_onboarding(st.session_state.config)
+            print("\n*** Thread ID:  " + st.session_state.config["configurable"]["thread_id"] + "****\n")
+            response = st.session_state.graph.invoke({"messages": st.session_state.prev_msgs + [HumanMessage(content=user_input)], "thread_id": st.session_state.config["configurable"]["thread_id"]}, config=st.session_state.config)
+            st.session_state.workflow.update_state(st.session_state.config, st.session_state.prev_msgs)
             final_resp = ""
             # simulate streaming
             for chunk in re.split(r'(\s+)', response["messages"][-1].content):

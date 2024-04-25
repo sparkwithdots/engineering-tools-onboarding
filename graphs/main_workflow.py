@@ -121,12 +121,12 @@ class MainWorkflow():
         self.query_services = []
         self.graph = None
     
-    def register_onboarding_service(self, service: str, onboard_svc: OnboardService):
+    def register_onboarding_service(self, service: str, onboard_svc: OnboardService, llm:ChatOpenAI):
         
         collect_info_func = collect_info_tool(onboardService=onboard_svc)       
         tool_executor = ToolExecutor([collect_info_func])
-        model = self.llm.bind_functions([convert_to_openai_function(t) for t in [collect_info_func]])        
-        collect_info_agent = partial(call_model, model=model, base_model=self.llm)
+        model = llm.bind_functions([convert_to_openai_function(t) for t in [collect_info_func]])
+        collect_info_agent = partial(call_model, model=model, base_model=llm)
         collect_info_action = partial(call_tool, tool_executor=tool_executor)
         onboard_svc_func = partial(onboard_service, onboardService=onboard_svc)
         
@@ -200,30 +200,26 @@ class MainWorkflow():
         self.graph = self.workflow.compile(checkpointer=self.memory)
         return self.graph
 
-    def update_state(self, config: RunnableConfig):
+    def update_state_after_onboarding(self, config: RunnableConfig):
         cur_state = self.graph.get_state(config=config).values
-        thread_id = config["configurable"]["thread_id"]
-        prev_msgs = []
         if cur_state:
             messages = cur_state["messages"]
             if isinstance(messages[-1], AIMessage) and "onboard_status" in messages[-1].additional_kwargs and messages[-1].additional_kwargs["onboard_status"] == "completed":
                 print("Onboarding completed, updating thread id")
                 thread_id = str(uuid.uuid4())
                 config["configurable"]["thread_id"] = thread_id
-            else:
-                cur_thread_id = cur_state["thread_id"]
-                if cur_thread_id and cur_thread_id != "":
-                    if config["configurable"]["thread_id"] != cur_thread_id:
-                        for message in messages[::-1]:
-                            if isinstance(message, HumanMessage):
-                                prev_msgs.append(message)
-                                break
-                        config["configurable"]["thread_id"] = cur_thread_id
-                        thread_id = cur_thread_id
-        return (thread_id, prev_msgs)
-        
-        
-        
-        
-        
+    
+    def update_state(self, config: RunnableConfig, prev_msgs: List[BaseMessage]):
+        cur_state = self.graph.get_state(config=config).values
+        prev_msgs.clear()
+        if cur_state:
+            messages = cur_state["messages"]            
+            cur_thread_id = cur_state["thread_id"]
+            if cur_thread_id and cur_thread_id != "":
+                if config["configurable"]["thread_id"] != cur_thread_id:
+                    for message in messages[::-1]:
+                        if isinstance(message, HumanMessage):
+                            prev_msgs.append(message)
+                            break
+                    config["configurable"]["thread_id"] = cur_thread_id
         
