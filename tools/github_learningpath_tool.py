@@ -1,6 +1,6 @@
 from langchain.pydantic_v1 import BaseModel
-from agents.base_learningpath_tool import BaseLearningPathTool
-from agents.learningpath_input import GitHubLearningPathInput
+from tools.base_learningpath_tool import BaseLearningPathTool
+from tools.learningpath_input import GitHubLearningPathInput
 from typing import Type
 from configs import Configs
 

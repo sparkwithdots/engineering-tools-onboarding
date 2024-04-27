@@ -1,7 +1,7 @@
-from agents.onboard_service import OnboardService
+from tools.onboard_service import OnboardService
 from langchain.pydantic_v1 import BaseModel
 from typing import Type
-from agents.onboarding_input import GitHubInput
+from tools.onboarding_input import GitHubInput
 
 class GitHubOnboardService(OnboardService):
     serviceArgSchema: Type[BaseModel] = GitHubInput

@@ -1,7 +1,7 @@
-from agents.launchdarkly_learningpath_tool import LaunchDarklyLearningPathTool
-from agents.github_learningpath_tool import GitHubLearningPathTool
-from agents.snyk_learningpath_tool import SnykLearningPathTool
-from agents.instant_tools import lookup_learningobjects
+from tools.launchdarkly_learningpath_tool import LaunchDarklyLearningPathTool
+from tools.github_learningpath_tool import GitHubLearningPathTool
+from tools.snyk_learningpath_tool import SnykLearningPathTool
+from tools.instant_tools import lookup_learningobjects
 from langchain_core.messages import HumanMessage
 import streamlit as st
 import time
@@ -9,9 +9,9 @@ import re
 import uuid
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
-from agents.github_onboard_service import GitHubOnboardService
-from agents.launchdarkly_onboard_service import LaunchDarklyOnboardService
-from agents.snyk_onboard_service import SnykOnboardService
+from tools.github_onboard_service import GitHubOnboardService
+from tools.launchdarkly_onboard_service import LaunchDarklyOnboardService
+from tools.snyk_onboard_service import SnykOnboardService
 from langchain_openai import ChatOpenAI
 from graphs.main_workflow import MainWorkflow
 from utils.base_service_query import BaseServiceQuery

@@ -12,7 +12,7 @@ from langchain_core.utils.function_calling import convert_to_openai_function
 from utils.onboarding_utils import has_all_info, get_user_data, get_service_and_feature, get_service_and_feature_from_messages, collect_info_tool, confirm_information, call_model, call_tool, onboard_service, onboard_abort
 import json
 from utils.agent_utils import create_func_agent
-from agents.onboard_service import OnboardService
+from tools.onboard_service import OnboardService
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from typing import List
 
