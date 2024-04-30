@@ -137,7 +137,7 @@ def onboard_service(state, onboardService):
     if not user_data or len(user_data) == 0:
         msg = "No user data provided."
     else:
-        msg = f"You are onboarding to {service} with the following information:\n \n " + " \n".join([f"{key}: {value}" for key, value in user_data.items()]) + " \n\n Once it is completed, you will be notified for confirmation."
+        msg = f"You are onboarding to {service} with the following information:\n \n " + " \n".join([f"{key}: {value}" for key, value in user_data.items()]) + " \n\n Once it is completed, you will be notified."
         asyncio.run(onboardService.onboard(user_data))
         state["messages"].clear()
     return {
