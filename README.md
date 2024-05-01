@@ -33,6 +33,10 @@ Once it is done, you will expect to see `learning_objects_with_embedding.csv` fi
 Under the project root folder, you can run the application as command below.
 ```
 $ streamlit run main.py
+
+# If you want to disable gathering usage stats from the browser, run
+
+$ streamlit run main.py --browser.gatherUsageStats false
 ```
 The application will listen to `8501` port by default, and you can open the URL from your browser.
 
