@@ -23,5 +23,5 @@ def create_func_agent(name: str, sys_prompt_path: str, sys_prompt_data: dict, to
     )
     func_agent = create_openai_functions_agent(llm, tools, prompt)
     executor = AgentExecutor(agent=func_agent, tools=tools, verbose=True)
-    return (name, executor)
+    return name, executor
 

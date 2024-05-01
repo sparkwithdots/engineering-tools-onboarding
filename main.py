@@ -81,7 +81,7 @@ def main():
     if "prev_msgs" not in st.session_state:
         st.session_state.prev_msgs = []
 
-    st.title("Onboarding to SaaS based engineering tools")
+    st.title("SaaS-based Engineering Tool Onboarding Assistant")
     
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -96,7 +96,6 @@ def main():
             message_placeholder = st.empty()
             
             st.session_state.workflow.update_state_after_onboarding(st.session_state.config)
-            print("\n*** Thread ID:  " + st.session_state.config["configurable"]["thread_id"] + "****\n")
             response = st.session_state.graph.invoke({"messages": st.session_state.prev_msgs + [HumanMessage(content=user_input)], "thread_id": st.session_state.config["configurable"]["thread_id"]}, config=st.session_state.config)
             st.session_state.workflow.update_state(st.session_state.config, st.session_state.prev_msgs)
             final_resp = ""

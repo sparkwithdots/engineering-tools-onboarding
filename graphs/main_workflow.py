@@ -66,7 +66,7 @@ def agent_node(state, agent, name):
 def route(state):
     messages = state["messages"]
     last_message = messages[-1]
-    # If there is no function call, then we finish
+    # If there is no function call, then finish
     if "function_call" not in last_message.additional_kwargs:
         return "End"
     else:
