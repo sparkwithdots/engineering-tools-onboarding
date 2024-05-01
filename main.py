@@ -100,11 +100,12 @@ def main():
             st.session_state.workflow.update_state(st.session_state.config, st.session_state.prev_msgs)
             final_resp = ""
             # simulate streaming
-            for chunk in re.split(r'(\s+)', response["messages"][-1].content):
+            ai_content = response["messages"][-1].content
+            for chunk in re.split(r'(\s+)', ai_content):
                 final_resp += chunk + " "
                 time.sleep(0.01)
                 message_placeholder.markdown(final_resp)
-        st.session_state.messages.append({"role": "assistant", "content": response["messages"][-1].content})
+        st.session_state.messages.append({"role": "assistant", "content": ai_content})
     
 
 if __name__ == "__main__":
