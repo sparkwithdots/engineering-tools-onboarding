@@ -7,7 +7,7 @@ from langchain_core.utils.function_calling import convert_to_openai_function
 import asyncio
 from configs import Configs
 import uuid
-from tools.onboarding_input import LaunchDarklyInput
+import functools
 
 
 class ServiceAndFeatureInput(BaseModel):
@@ -44,8 +44,11 @@ def get_required_fields(service):
     required_keys = service_config.get("required_keys", [])
     return [item["key"] for item in required_keys]
 
-def has_all_info(service, user_data):
-    fields = get_required_fields(service)
+def has_all_info(service, workflow, user_data):
+    onboard_svc = workflow.onboarding_services_mapper[service.lower()]
+    if not onboard_svc:
+        raise ValueError("Onboard Service is not provided.")
+    fields = list(onboard_svc.__fields__.keys())
     if not user_data or len(user_data) == 0:
         return fields[0]
     for field in fields:
@@ -72,7 +75,7 @@ def confirm_onboarding(state):
         ]
     }
 
-def collect_info(**kwargs):
+def collect_info(workflow, **kwargs):
     """Collects the information from the user"""
     if not kwargs or len(kwargs) == 0 or "service" not in kwargs.keys():
         msg = "Required information is not provided yet"
@@ -84,7 +87,7 @@ def collect_info(**kwargs):
         if not user_data or len(user_data) == 0:
             msg = "No user data provided."
         else:
-            missing_field = has_all_info(service, user_data)
+            missing_field = has_all_info(service, workflow, user_data)
             if missing_field == "":
                 msg = "All information has been collected."
             else:
@@ -98,26 +101,27 @@ def collect_info(**kwargs):
         ]
     }
 
-def collect_info_tool(onboardService):
+def collect_info_tool(workflow, onboardService):
+    collect_info_partial = functools.partial(collect_info, workflow=workflow)
     return StructuredTool.from_function(
-        func=collect_info,
+        func=collect_info_partial,
         name="collect_info",
         description="Collects the information from the user, must collect all information required for onboarding.",
         return_direct=False,
         args_schema=onboardService.serviceArgSchema,
     )
 
-def confirm_information(state):
+def confirm_information(state, workflow):
     """Confirm the information the user has provided and see if the user wants to continue or abort the onboarding process"""
     messages = state["messages"]
     service, _ = get_service_and_feature_from_messages(messages)
     if not service or service == "":
         raise ValueError("Service is not provided.")
     user_data = get_user_data(messages)
-    if has_all_info(service, user_data) == "":
+    if has_all_info(service, workflow, user_data) == "":
         msg = "Thanks for providing all the information. Do you want to continue the onboarding(yes/no) or update the information?"
     else:
-        missing_field = has_all_info(service, user_data)
+        missing_field = has_all_info(service, workflow, user_data)
         msg = f"Still need to collect information for {missing_field}."
     return {
         "messages": [

@@ -48,7 +48,7 @@ def agent_node(state, agent, name):
     return {"messages": [HumanMessage(content=content, name=name)], "service": service, "feature": feature, "thread_id": thread_id}
 
 # route function for conditional edges
-def route(state):
+def route(state, workflow):
     messages = state["messages"]
     last_message = messages[-1]
     # If there is no function call, then finish
@@ -74,7 +74,7 @@ def route(state):
                 raise ValueError("Service is not provided.")
             if last_message.additional_kwargs["function_call"]["name"] in ["collect_info", "initiate_onboarding"]:
                 user_data = get_user_data(messages)
-                if has_all_info(service, user_data) == "":
+                if has_all_info(service, workflow, user_data) == "":
                     return f"{service}_ConfirmInfoAgent"
                 else:
                     return f"{service}_CollectInfoAction"
@@ -93,7 +93,7 @@ def route(state):
                 return "End"
 
 class MainWorkflow():
-    
+
     def __init__(self, llm: ChatOpenAI, memory: BaseCheckpointSaver = None):
         self.workflow = StateGraph(AgentState)
         self.llm = llm
@@ -101,6 +101,7 @@ class MainWorkflow():
         self.onboarding_nodes = {}
         self.learningpath_nodes = {}
         self.onboarding_services = []
+        self.onboarding_services_mapper = {}
         self.learningpath_services = []
         self.query_nodes = {}
         self.query_services = []
@@ -113,20 +114,23 @@ class MainWorkflow():
     
     def register_onboarding_service(self, service: str, onboard_svc: OnboardService, llm:ChatOpenAI):
         
-        collect_info_func = collect_info_tool(onboardService=onboard_svc)       
+        collect_info_func = collect_info_tool(workflow=self, onboardService=onboard_svc)
         tool_executor = ToolExecutor([collect_info_func])
         model = llm.bind_functions(functions=[convert_to_openai_function(t) for t in [collect_info_func]], function_call="auto")
         collect_info_agent = partial(call_model, model=model, base_model=llm)
         collect_info_action = partial(call_tool, tool_executor=tool_executor)
         onboard_svc_func = partial(onboard_service, onboardService=onboard_svc)
+
+        confirm_info_func = partial(confirm_information, workflow=self)
         
         self.onboarding_nodes[f"{service}_CollectInfoAgent"] = collect_info_agent
         self.onboarding_nodes[f"{service}_CollectInfoAction"] = collect_info_action
-        self.onboarding_nodes[f"{service}_ConfirmInfoAgent"] = confirm_information
+        self.onboarding_nodes[f"{service}_ConfirmInfoAgent"] = confirm_info_func
         self.onboarding_nodes[f"{service}_OnboardAgent"] = onboard_svc_func
         self.onboarding_nodes[f"{service}_OnboardAbort"] = onboard_abort
         
         self.onboarding_services.append(service)
+        self.onboarding_services_mapper[service] = onboard_svc.serviceArgSchema
     
     def register_learningpath_service(self, service: str, prompt_path: str, prompt_data: dict, tools: List, llm: ChatOpenAI):
         name, learningpath_agent = create_func_agent(name=f"{service}_learningpath", sys_prompt_path=prompt_path, sys_prompt_data=prompt_data, tools=tools, llm=llm)
@@ -165,16 +169,17 @@ class MainWorkflow():
         self.workflow.add_node("general", general_node)
         nodes["general"] = "general"
         nodes["End"] = END
-        self.workflow.add_conditional_edges("router", route, nodes)
+        route_func = partial(route, workflow=self)
+        self.workflow.add_conditional_edges("router", route_func, nodes)
         for service in self.onboarding_services:
-            self.workflow.add_conditional_edges(f"{service}_CollectInfoAgent", route, {
+            self.workflow.add_conditional_edges(f"{service}_CollectInfoAgent", route_func, {
                 f"{service}_CollectInfoAction": f"{service}_CollectInfoAction",
                 f"{service}_ConfirmInfoAgent": f"{service}_ConfirmInfoAgent",
                 f"{service}_OnboardAgent": f"{service}_OnboardAgent",
                 f"{service}_OnboardAbort": f"{service}_OnboardAbort",
                 "End": END
             })
-            self.workflow.add_conditional_edges(f"{service}_ConfirmInfoAgent", route, {
+            self.workflow.add_conditional_edges(f"{service}_ConfirmInfoAgent", route_func, {
                 f"{service}_ConfirmInfoAgent": f"{service}_ConfirmInfoAgent",
                 f"{service}_OnboardAgent": f"{service}_OnboardAgent",
                 f"{service}_OnboardAbort": f"{service}_OnboardAbort",
