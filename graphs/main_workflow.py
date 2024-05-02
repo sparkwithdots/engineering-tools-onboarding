@@ -15,6 +15,7 @@ from utils.agent_utils import create_func_agent
 from tools.onboard_service import OnboardService
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from typing import List
+from langchain_core.prompts import PromptTemplate
 
 
 class AgentState(TypedDict):
@@ -22,22 +23,6 @@ class AgentState(TypedDict):
     service: Annotated[str, Field(description="The service the user is on", title="Service", default="")]
     feature: Annotated[str, Field(description="The feature the user is on", title="Feature", default="")]
     thread_id: Annotated[str, Field(description="The thread id for the conversation", title="Thread ID", default="")]
-
-def get_general_messages(messages):
-    sys_msg = """
-    Your job is to help identify what service and feature the user is looking at. Currently the supported services are:
-    - github
-    - launchdarkly
-    - snyk
-    
-    For each service, the supported features are:
-    - onboarding: Help the user onboard to the service.
-    - learningpath: Provide advice on the learning path for the service depends on user's knowledge level or preferences. User can request to learn or know something about the service.
-    - query: Answer user's questions about the service other than onboarding and learning paths.
-    
-    For others, show user what you services and features you offer and ask them to provide what they need to request.
-    """ 
-    return [SystemMessage(content=sys_msg)] + messages
 
 # Handle agent and convert to agent graph node
 def agent_node(state, agent, name):
@@ -103,7 +88,7 @@ def route(state):
                     else:
                         return f"{service}_ConfirmInfoAgent"
                 else:
-                    return "End"
+                    return f"{service}_ConfirmInfoAgent"
             else:
                 return "End"
 
@@ -120,6 +105,11 @@ class MainWorkflow():
         self.query_nodes = {}
         self.query_services = []
         self.graph = None
+    
+    def get_general_messages(self, messages):
+        sys_template = PromptTemplate.from_file(template_file="prompts/templates/route.jinja", template_format="jinja2")
+        sys_msg = sys_template.format(onboarding_services=self.onboarding_services, learningpath_services=self.learningpath_services, query_services=self.query_services)
+        return [SystemMessage(content=sys_msg)] + messages
     
     def register_onboarding_service(self, service: str, onboard_svc: OnboardService, llm:ChatOpenAI):
         
@@ -152,10 +142,10 @@ class MainWorkflow():
         
     def build_graph(self):
         router_model = self.llm.bind_functions(functions=[convert_to_openai_function(t) for t in [get_service_and_feature]], function_call="get_service_and_feature")
-        router_chain = get_general_messages | router_model
+        router_chain = self.get_general_messages | router_model
         router = partial(call_model, model=router_chain, base_model=self.llm)
 
-        general_chain = get_general_messages | self.llm
+        general_chain = self.get_general_messages | self.llm
         general_node = partial(call_model, model=general_chain, base_model=self.llm)
         
         self.workflow.add_node("router", router)
@@ -222,9 +212,12 @@ class MainWorkflow():
             cur_thread_id = cur_state["thread_id"]
             if cur_thread_id and cur_thread_id != "":
                 if config["configurable"]["thread_id"] != cur_thread_id:
-                    for message in messages[::-1]:
-                        if isinstance(message, HumanMessage):
-                            prev_msgs.append(message)
-                            break
+                    if len(messages) > 1:
+                        # add last human message and last AI message as context for new state
+                        for message in messages[::-1]:
+                            if isinstance(message, HumanMessage):
+                                prev_msgs.append(message)
+                                break
+                        prev_msgs.append(messages[-1])
                     config["configurable"]["thread_id"] = cur_thread_id
         

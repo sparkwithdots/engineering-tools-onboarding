@@ -7,10 +7,11 @@ from langchain_core.utils.function_calling import convert_to_openai_function
 import asyncio
 from configs import Configs
 import uuid
+from tools.onboarding_input import LaunchDarklyInput
 
 
 class ServiceAndFeatureInput(BaseModel):
-    service: str = Field(description="The service the user is looking at, should be one of: github, launchdarkly, snyk", title="Service", default="")
+    service: str = Field(description="The service the user is looking at. The value should be lowercase.", title="Service", default="")
     feature: str = Field(description="The supported features, should be one of: onboarding, learningpath, query", title="Feature", default="")
 
 class ConfirmOnboardInput(BaseModel):
@@ -101,7 +102,7 @@ def collect_info_tool(onboardService):
     return StructuredTool.from_function(
         func=collect_info,
         name="collect_info",
-        description="Collects the information from the user, must collect all information required for onboarding",
+        description="Collects the information from the user, must collect all information required for onboarding.",
         return_direct=False,
         args_schema=onboardService.serviceArgSchema,
     )
