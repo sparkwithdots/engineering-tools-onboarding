@@ -1,6 +1,6 @@
 # AI Assistant for Engineering Tools Onboarding
 
-This repo is the complete code for article [SaaS-based Engineering Tool Onboarding with AI Assistance](link goes here).
+This repo is the complete code for article [SaaS-based Engineering Tool Onboarding with AI Assistance](https://sparkwithdots.medium.com/saas-based-engineering-tool-onboarding-with-ai-assistance-c34c533224a7).
 
 This prototype application uses dummy data and partial official SaaS platform documentation and downloaded public PDFs as source of knowledge base for demo purposes.
 
