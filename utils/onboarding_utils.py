@@ -118,10 +118,10 @@ def confirm_information(state, workflow):
     if not service or service == "":
         raise ValueError("Service is not provided.")
     user_data = get_user_data(messages)
-    if has_all_info(service, workflow, user_data) == "":
+    missing_field = has_all_info(service, workflow, user_data)
+    if missing_field == "":
         msg = "Thanks for providing all the information. Do you want to continue the onboarding(yes/no) or update the information?"
     else:
-        missing_field = has_all_info(service, workflow, user_data)
         msg = f"Still need to collect information for {missing_field}."
     return {
         "messages": [
@@ -172,7 +172,7 @@ def onboard_abort(state):
 
 def get_confirm_messages(messages):
     sys_msg = """
-    Your job is to help identify if the user want to continue or abort the onboarding process. 
+    Your job is to help identify if the user wants to continue or abort the onboarding process. 
     For other options, tell them to provide the correct choice (yes or no).
     """   
     messages = [SystemMessage(content=sys_msg)] + messages

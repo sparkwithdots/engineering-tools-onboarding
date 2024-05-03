@@ -18,7 +18,6 @@ class BaseLearningPathTool(BaseTool):
             return "Sorry, I can't find an appropriate learning path for you. Or you can just simply choose from beginner, intermediate, or advanced."
         learningObjects = Configs.get_service_config(self.service, "learningObjects", "learningpath")
         if len(preferences) > 0:
-            print("preferences: ", preferences)
             df = generate_learning_objects_dataframe()
             topics_with_preference = search_learning_objects(self.service, preferences, df)
             learningObjects = list(filter(lambda x: x["topic"] in topics_with_preference, learningObjects))
