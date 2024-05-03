@@ -6,6 +6,7 @@ This prototype application uses dummy data and partial official SaaS platform do
 
 ## Demo
 
+https://github.com/sparkwithdots/engineering-tools-onboarding/assets/153865750/b426f3be-d35e-4517-b93f-aae977b9a2d2
 
 ## Prepare environment
 
