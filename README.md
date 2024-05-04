@@ -2,7 +2,26 @@
 
 This repo is the complete code for article [SaaS-based Engineering Tool Onboarding with AI Assistance](https://pub.towardsai.net/saas-based-engineering-tool-onboarding-with-ai-assistance-c34c533224a7).
 
-This prototype application uses dummy data and partial official SaaS platform documentation and downloaded public PDFs as source of knowledge base for demo purposes.
+This prototype application picks `GitHub`, `Snyk` and `LaunchDarkly` services as example SaaS platform, uses dummy data and partial official SaaS platform documentation and downloaded public PDFs as source of knowledge base for demo purposes. The actual onboarding logic is not implemented in this prototype application. You can easily add additional services. Take `onboarding` feature for example, define the `pydantic` model and a service wrapper like below, and you implement the `onboard` method.
+```
+class SomeServiceInput(BaseModel):
+   service: str = Field(description="The service you are onboarding to", title="Service", default="some_service")
+   field1: str = Field(description="This is field1", title="Field1", default="")
+   ...
+
+class SomeServiceOnboard(OnboardService):
+   serviceArgSchema: Type[BaseModel] = SomeServiceInput
+
+   async def onboard(self, user_data):
+      # process onboard
+      pass
+```
+
+Then, you register this service with the graph, it will automatically expand the new nodes and edges accordingly.
+```
+some_service = SomeServiceOnboard(service="some_service")
+main_workflow.register_onboarding_service(service="someservice", onboard_svc=some_service, llm=llm)
+```
 
 ## Demo
 
