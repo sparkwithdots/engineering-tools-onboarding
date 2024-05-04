@@ -2,6 +2,10 @@
 
 This repo is the complete code for article [SaaS-based Engineering Tool Onboarding with AI Assistance](https://pub.towardsai.net/saas-based-engineering-tool-onboarding-with-ai-assistance-c34c533224a7).
 
+## Demo
+
+https://github.com/sparkwithdots/engineering-tools-onboarding/assets/153865750/b426f3be-d35e-4517-b93f-aae977b9a2d2
+
 This prototype application picks `GitHub`, `Snyk` and `LaunchDarkly` services as example SaaS platform, uses dummy data and partial official SaaS platform documentation and downloaded public PDFs as source of knowledge base for demo purposes. The actual onboarding logic is not implemented in this prototype application. You can easily add additional services. Take `onboarding` feature for example, define the `pydantic` model and a service wrapper like below, and you implement the `onboard` method.
 ```
 class SomeServiceInput(BaseModel):
@@ -22,10 +26,6 @@ Then, you register this service with the graph, it will automatically expand the
 some_service = SomeServiceOnboard(service="some_service")
 main_workflow.register_onboarding_service(service="someservice", onboard_svc=some_service, llm=llm)
 ```
-
-## Demo
-
-https://github.com/sparkwithdots/engineering-tools-onboarding/assets/153865750/b426f3be-d35e-4517-b93f-aae977b9a2d2
 
 ## Prepare environment
 
